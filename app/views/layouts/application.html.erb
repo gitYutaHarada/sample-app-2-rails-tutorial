@@ -1,11 +1,9 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title><%= content_for(:title) || "Sample App 2 Rails Tutorial" %></title>
+    <title><%= yield(:title) %> | Ruby on Rails Tutorial Sample App</title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="application-name" content="Sample App 2 Rails Tutorial">
-    <meta name="mobile-web-app-capable" content="yes">
+    <meta charset="utf-8">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
