@@ -1,8 +1,8 @@
 ENV["RAILS_ENV"] ||= "test"
 require_relative "../config/environment"
 require "rails/test_help"
-require "minitest/resporters"
-Minitest::Resporters.user!
+require "minitest/reporters"
+Minitest::Reporters.use!
 
 module ActiveSupport
   class TestCase
