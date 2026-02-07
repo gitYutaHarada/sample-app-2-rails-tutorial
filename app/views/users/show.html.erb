@@ -1,1 +1,11 @@
-<%= @user.name %>, <%= @user.email %>
+<% provide(:title, @user.name) %>
+<div class="row">
+    <aside class="col-md-4">
+        <section class="user_info">
+            <h1>
+                <%= image_tag("https://secure.gravatar.com/avatar/#{Digest::MD5::hexdigest(@user.email.downcase)}", alt: @user.name, class: "gravatar") %>
+                <%= @user.name %>
+            </h1>
+        </section>
+    </aside>
+</div>
