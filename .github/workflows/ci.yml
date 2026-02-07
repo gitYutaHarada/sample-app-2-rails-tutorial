@@ -16,7 +16,7 @@ jobs:
           bundler-cache: true
       
       - name: テスト用データベースの準備
-        run: bin/rails db:test:prepare
+        run: bundle exec rails db:test:prepare
 
       - name: テスト実行
         run: bin/rails test
