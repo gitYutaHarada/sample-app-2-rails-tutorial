@@ -23,5 +23,3 @@ Things you may want to cover:
 
 * ...
 # sample-app-2-rails-tutorial
-
-try-ci-test
