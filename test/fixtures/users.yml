@@ -1,0 +1,13 @@
+<%
+  if ActiveModel::SecurePassword.min_cost
+    cost = BCrypt::Engine::MIN_COST
+  else
+    cost = BCrypt::Engine.cost
+  end
+  password = BCrypt::Password.create("password", cost: cost)
+%>
+
+michael:
+  name: Michael Example
+  email: michael@example.com
+  password_digest: <%= password %>
