@@ -39,4 +39,13 @@ class UsersLoginTest < ActionDispatch::IntegrationTest
     assert_select "a[href=?]", logout_path,      count: 0
     assert_select "a[href=?]", user_path(@user), count: 0
   end
+
+  test "二つ目のウィンドウでログアウトした後にそのまま続行されることを書く続行されることを確認" do
+    @user = users(:michael)
+    post login_path, params: { session: { email:    @user.email,
+                                          password: "password" } }
+    delete logout_path
+    delete logout_path
+    assert_redirected_to root_url
+  end
 end
