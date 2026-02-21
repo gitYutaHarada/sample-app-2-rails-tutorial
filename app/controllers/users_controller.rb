@@ -18,4 +18,8 @@ class UsersController < ApplicationController
       render "new", status: :unprocessable_entity
     end
   end
+
+  def edit
+    @user = User.find_by(id: params[:id])
+  end
 end
