@@ -6,6 +6,7 @@ class SessionsController < ApplicationController
     user = User.find_by(email: params[:session][:email].downcase)
     if user && user.authenticate(params[:session][:password])
       reset_session
+
       user.remember_token = SecureRandom.urlsafe_base64
       if ActiveModel::SecurePassword.min_cost
         cost = BCrypt::Engine::MIN_COST
@@ -14,8 +15,24 @@ class SessionsController < ApplicationController
       end
       digest_string = BCrypt::Password.create(user.remember_token, cost: cost)
       user.update_attribute(:remember_digest, digest_string)
+
       cookies.permanent.encrypted[:user_id] = user.id
       cookies.permanent[:remember_token] = user.remember_token
+
+      if params[:session][:remember_me] == "1"
+        user.remember_token = SecureRandom.urlsafe_base64
+        if ActiveModel::SecurePassword.min_cost
+          cost = BCrypt::Engine::MIN_COST
+        else
+          cost = BCrypt::Engine.cost
+        end
+        user.update_attribute(:remember_digest, BCrypt::Password.create(user.remember_token, cost: cost))
+      else
+        user.update_attribute(:remember_digest, nil)
+        cookies.delete(:user_id)
+        cookies.delete(:remember_token)
+      end
+
       session[:user_id] = user.id
       redirect_to user
     else
