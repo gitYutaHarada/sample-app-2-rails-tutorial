@@ -34,6 +34,23 @@ class SessionsController < ApplicationController
       end
 
       session[:user_id] = user.id
+
+
+      if user.remember_digest.present?
+        user.session_token = user.remember_digest
+      else
+        user.remember_token = SecureRandom.urlsafe_base64
+        if ActiveModel::SecurePassword.min_cost
+          cost = BCrypt::Engine::MIN_COST
+        else
+          cost = BCrypt::Engine.cost
+        end
+        remember_digest = BCrypt::Password.create(user.remember_token, cost: cost)
+        user.update_attribute(:remember_digest, remember_digest)
+        user.session_token = remember_digest
+      end
+
+      session[:session_token] = user.session_token
       redirect_to user
     else
       flash.now[:danger] = "Invalid email/password combination"

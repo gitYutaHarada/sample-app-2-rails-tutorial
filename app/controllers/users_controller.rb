@@ -16,6 +16,11 @@ class UsersController < ApplicationController
       redirect_to login_url, status: :see_other
     end
   }, only: [ :edit, :update ]
+
+  before_action -> {
+    @user = User.find(params[:id])
+    redirect_to(root_url, status: :see_other) unless @user == @current_user
+  }, only: [ :edit, :update ]
   def show
     @user = User.find(params[:id])
   end

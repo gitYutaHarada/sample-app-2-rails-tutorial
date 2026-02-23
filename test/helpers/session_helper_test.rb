@@ -19,10 +19,24 @@ class SessionHelperTest < ActionView::TestCase
         current_user = User.find_by(id: session[:user_id])
       end
     elsif cookies.encrypted[:user_id]
-      user = User.find_by(id: cookies.encrypted[:user_id])
-      if user && BCrypt::Password.new(user.remember_digest).is_password?(cookies[:remember_token])
-        session[:user_id] = user.id
-        current_user = user
+      @user = User.find_by(id: cookies.encrypted[:user_id])
+      if @user && BCrypt::Password.new(@user.remember_digest).is_password?(cookies[:remember_token])
+        session[:user_id] = @user.id
+
+        if @user.remember_digest.present?
+          @user.session_token = @user.remember_digest
+        else
+          @user.remember_token = SecureRandom.urlsafe_base64
+          if ActiveModel::SecurePassword.min_cost
+            cost = BCrypt::Engine::MIN_COST
+          else
+            cost = BCrypt::Engine.cost
+          end
+          @user.session_token = BCrypt::Password.create(@user.remember_token, cost: cost)
+          @user.update_attribute(:remember_digest, @user.session_token)
+        end
+        session[:session_token] = @user.session_token
+        current_user = @user
       end
     end
     assert_equal @user, current_user
@@ -33,17 +47,20 @@ class SessionHelperTest < ActionView::TestCase
     if ActiveModel::SecurePassword.min_cost
       cost = BCrypt::Engine::MIN_COST
     else
-      cost = BCrypt::Engine.min_cost
+      cost = BCrypt::Engine.cost
     end
     @user.update_attribute(:remember_digest, BCrypt::Password.create(SecureRandom.urlsafe_base64, cost: cost))
 
     if session[:user_id]
       if current_user.nil?
         current_user = User.find_by(id: session[:user_id])
+        if @user && session[:session_token] == @user.session_token
+          current_user = @user
+        end
       end
     elsif cookies.encrypted[:user_id]
-      user = User.find_by(id: cookies.encrypted[:user_id])
-      if user && BCrypt::Password.new(@user.remember_digest).is_password?(cookies[:remember_token])
+      @user = User.find_by(id: cookies.encrypted[:user_id])
+      if @user && BCrypt::Password.new(@user.remember_digest).is_password?(cookies[:remember_token])
         session[:user_id] = @user.id
         current_user = @user
       end
